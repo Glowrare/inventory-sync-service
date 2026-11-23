@@ -1,0 +1,2 @@
+PASS: Node v20.20.2; both CLI entrypoints bind to loopback; real synchronization succeeds.
+Stopped both smoke-test child processes.

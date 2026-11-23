@@ -1,0 +1,21 @@
+{
+  "name": "dependency-security-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Internal inventory synchronization service with a local supplier integration",
+  "type": "module",
+  "engines": { "node": ">=20 <21" },
+  "packageManager": "npm@10.8.2",
+  "scripts": {
+    "start": "node src/server.js",
+    "start:supplier": "node src/mock-supplier/server.js",
+    "check": "node scripts/check.js",
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage",
+    "validate": "npm run check && npm test"
+  },
+  "dependencies": {
+    "axios": "1.11.0",
+    "express": "5.1.0"
+  }
+}

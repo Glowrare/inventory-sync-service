@@ -1,0 +1,188 @@
+
+> dependency-security-lab@0.1.0 validate
+> npm run check && npm test
+
+
+> dependency-security-lab@0.1.0 check
+> node scripts/check.js
+
+JavaScript syntax checks passed.
+
+> dependency-security-lab@0.1.0 test
+> node --test
+
+TAP version 13
+# Subtest: real supplier and API list, find, synchronize, and expose successful status
+ok 1 - real supplier and API list, find, synchronize, and expose successful status
+  ---
+  duration_ms: 153.4892
+  ...
+# Subtest: unknown item and unknown route return sanitized 404s
+ok 2 - unknown item and unknown route return sanitized 404s
+  ---
+  duration_ms: 28.9363
+  ...
+# Subtest: malformed JSON produces a safe 502 and preserves inventory
+ok 3 - malformed JSON produces a safe 502 and preserves inventory
+  ---
+  duration_ms: 51.0537
+  ...
+# Subtest: HTML response produces a safe 502 and preserves inventory
+ok 4 - HTML response produces a safe 502 and preserves inventory
+  ---
+  duration_ms: 49.651
+  ...
+# Subtest: invalid stock produces a safe 502 and preserves inventory
+ok 5 - invalid stock produces a safe 502 and preserves inventory
+  ---
+  duration_ms: 47.1624
+  ...
+# Subtest: upstream HTTP errors do not expose response bodies
+ok 6 - upstream HTTP errors do not expose response bodies
+  ---
+  duration_ms: 60.8221
+  ...
+# Subtest: connection refusal returns safe 502
+ok 7 - connection refusal returns safe 502
+  ---
+  duration_ms: 36.3485
+  ...
+# Subtest: upstream connection reset returns safe 502
+ok 8 - upstream connection reset returns safe 502
+  ---
+  duration_ms: 20.7826
+  ...
+# Subtest: real Axios timeout returns safe 504 and retains inventory
+ok 9 - real Axios timeout returns safe 504 and retains inventory
+  ---
+  duration_ms: 145.4012
+  ...
+# Subtest: HTTP synchronization rejects overlap and recovers after upstream failure
+ok 10 - HTTP synchronization rejects overlap and recovers after upstream failure
+  ---
+  duration_ms: 61.4816
+  ...
+# Subtest: unexpected internal error is sanitized by HTTP middleware
+ok 11 - unexpected internal error is sanitized by HTTP middleware
+  ---
+  duration_ms: 14.0218
+  ...
+# Subtest: mapping uses supplier and SKU, preserves identities, accepts zero, and leaves inputs unchanged
+ok 12 - mapping uses supplier and SKU, preserves identities, accepts zero, and leaves inputs unchanged
+  ---
+  duration_ms: 9.8368
+  ...
+# Subtest: rejects null response
+ok 13 - rejects null response
+  ---
+  duration_ms: 1.7797
+  ...
+# Subtest: rejects non-object JSON
+ok 14 - rejects non-object JSON
+  ---
+  duration_ms: 1.39
+  ...
+# Subtest: rejects missing items
+ok 15 - rejects missing items
+  ---
+  duration_ms: 1.1565
+  ...
+# Subtest: rejects items is not an array
+ok 16 - rejects items is not an array
+  ---
+  duration_ms: 1.4138
+  ...
+# Subtest: rejects incomplete snapshot
+ok 17 - rejects incomplete snapshot
+  ---
+  duration_ms: 0.8942
+  ...
+# Subtest: rejects null item
+ok 18 - rejects null item
+  ---
+  duration_ms: 1.8682
+  ...
+# Subtest: rejects missing SKU
+ok 19 - rejects missing SKU
+  ---
+  duration_ms: 0.9135
+  ...
+# Subtest: rejects unknown supplier
+ok 20 - rejects unknown supplier
+  ---
+  duration_ms: 1.0729
+  ...
+# Subtest: rejects unknown SKU
+ok 21 - rejects unknown SKU
+  ---
+  duration_ms: 1.155
+  ...
+# Subtest: rejects duplicate mapping
+ok 22 - rejects duplicate mapping
+  ---
+  duration_ms: 0.911
+  ...
+# Subtest: rejects negative quantity
+ok 23 - rejects negative quantity
+  ---
+  duration_ms: 1.1822
+  ...
+# Subtest: rejects fractional quantity
+ok 24 - rejects fractional quantity
+  ---
+  duration_ms: 1.351
+  ...
+# Subtest: rejects numeric string
+ok 25 - rejects numeric string
+  ---
+  duration_ms: 1.0227
+  ...
+# Subtest: rejects missing cost
+ok 26 - rejects missing cost
+  ---
+  duration_ms: 1.8617
+  ...
+# Subtest: rejects fractional cost
+ok 27 - rejects fractional cost
+  ---
+  duration_ms: 1.4008
+  ...
+# Subtest: rejects negative cost
+ok 28 - rejects negative cost
+  ---
+  duration_ms: 1.0146
+  ...
+# Subtest: rejects unsafe integer
+ok 29 - rejects unsafe integer
+  ---
+  duration_ms: 1.3801
+  ...
+# Subtest: store returns copies and does not mutate fixture records
+ok 30 - store returns copies and does not mutate fixture records
+  ---
+  duration_ms: 6.3437
+  ...
+# Subtest: failed synchronization is atomic, retains last success, and supports recovery
+ok 31 - failed synchronization is atomic, retains last success, and supports recovery
+  ---
+  duration_ms: 1.5998
+  ...
+# Subtest: overlapping synchronizations reject without corrupting the active attempt
+ok 32 - overlapping synchronizations reject without corrupting the active attempt
+  ---
+  duration_ms: 1.3557
+  ...
+# Subtest: unexpected exceptions become sanitized service failures
+ok 33 - unexpected exceptions become sanitized service failures
+  ---
+  duration_ms: 1.2081
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2060.8274

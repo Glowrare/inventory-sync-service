@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "supplierId": "sup-meadow", "sku": "SYN-TRAY-S", "availableQuantity": 9, "unitCostCents": 1100 },
+    { "supplierId": "sup-aurora", "sku": "SYN-NOTE-A5", "availableQuantity": 24, "unitCostCents": 310 },
+    { "supplierId": "sup-aurora", "sku": "SYN-PEN-BLUE", "availableQuantity": 0, "unitCostCents": 80 }
+  ]
+}

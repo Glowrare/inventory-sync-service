@@ -1,0 +1,5 @@
+[
+  { "id": "inv-001", "sku": "SYN-NOTE-A5", "name": "Synthetic A5 notebook", "supplierId": "sup-aurora", "quantity": 12, "unitCostCents": 325 },
+  { "id": "inv-002", "sku": "SYN-PEN-BLUE", "name": "Synthetic blue pen", "supplierId": "sup-aurora", "quantity": 30, "unitCostCents": 85 },
+  { "id": "inv-003", "sku": "SYN-TRAY-S", "name": "Synthetic desk tray", "supplierId": "sup-meadow", "quantity": 4, "unitCostCents": 1150 }
+]

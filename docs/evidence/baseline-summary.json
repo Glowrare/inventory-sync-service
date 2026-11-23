@@ -1,0 +1,49 @@
+{
+  "validationDate": "2026-11-23",
+  "nodeVersion": "20.20.2",
+  "npmVersion": "10.8.2",
+  "cleanInstall": {
+    "command": "npm ci --ignore-scripts --no-audit --no-fund",
+    "exitCode": 0,
+    "installedPackageLocations": 79,
+    "lockfileUnchanged": true
+  },
+  "lockfileSha256": "d2cdaf03e6dc9a45b2e7ec9ba5ff89a5a318eb84eb5f82dc8635671768713743",
+  "directDependencies": {
+    "axios": "1.11.0",
+    "express": "5.1.0"
+  },
+  "axiosDependencies": {
+    "follow-redirects": "1.16.3",
+    "form-data": "4.0.6",
+    "proxy-from-env": "1.1.0"
+  },
+  "validation": {
+    "command": "npm run validate",
+    "exitCode": 0,
+    "tests": 33,
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "command": "npm run test:coverage",
+    "exitCode": 0,
+    "loadedApplicationLinePercent": 100,
+    "includesStartupEntrypoints": false
+  },
+  "startupSmoke": {
+    "exitCode": 0,
+    "stoppedChildren": true
+  },
+  "audit": {
+    "command": "npm audit --json",
+    "exitCode": 1,
+    "affectedPackages": 1,
+    "advisoryRecords": 32
+  },
+  "installedTree": {
+    "command": "npm ls --all --json",
+    "exitCode": 0
+  }
+}
