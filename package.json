@@ -15,7 +15,7 @@
     "validate": "npm run check && npm test"
   },
   "dependencies": {
-    "axios": "1.11.0",
+    "axios": "1.20.0",
     "express": "5.1.0"
   }
 }
