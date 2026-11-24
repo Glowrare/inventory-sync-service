@@ -1,8 +1,16 @@
 import axios from 'axios';
 import { ServiceError } from './errors.js';
 
-export function createSupplierClient({ baseURL = 'http://127.0.0.1:3001', timeout = 1500 } = {}) {
-  const client = axios.create({ baseURL, timeout, responseType: 'json' });
+export function createSupplierClient({
+  baseURL = 'http://127.0.0.1:3001',
+  timeout = 1500,
+} = {}) {
+  const client = axios.create({
+    baseURL,
+    timeout,
+    responseType: 'json',
+    proxy: false,
+  });
   return {
     async fetchStock() {
       try {
@@ -13,6 +21,6 @@ export function createSupplierClient({ baseURL = 'http://127.0.0.1:3001', timeou
         }
         throw new ServiceError('SUPPLIER_UNAVAILABLE');
       }
-    }
+    },
   };
 }
