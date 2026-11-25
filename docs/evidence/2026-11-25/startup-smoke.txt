@@ -1,0 +1,5 @@
+Synthetic supplier: http://127.0.0.1:63934
+Inventory Sync Service: http://127.0.0.1:63933
+PASS: Node v24.22.3; both CLI entrypoints started on loopback using configured ports.
+PASS: initial inventory, item retrieval, synchronization, quantities [24, 0, 9], costs [310, 80, 1100], and succeeded status.
+Stopped both smoke-test child processes.

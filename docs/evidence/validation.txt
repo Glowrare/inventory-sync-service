@@ -1,14 +1,14 @@
 
-> dependency-security-lab@0.1.0 validate
+> inventory-sync-service@0.1.0 validate
 > npm run check && npm test
 
 
-> dependency-security-lab@0.1.0 check
+> inventory-sync-service@0.1.0 check
 > node scripts/check.js
 
 JavaScript syntax checks passed.
 
-> dependency-security-lab@0.1.0 test
+> inventory-sync-service@0.1.0 test
 > node --test
 
 TAP version 13

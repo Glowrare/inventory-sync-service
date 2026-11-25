@@ -1,51 +1,59 @@
 # Baseline validation
 
-Validation date: **2026-11-23**.
-
-The inventory synchronization service was validated with **Node.js 20.20.2** and **npm 10.8.2**, using the dependency versions in package-lock.json. Axios **1.11.0** and Express **5.1.0** are exact direct pins. Known dependency vulnerabilities remain unresolved.
+Validated **November 25, 2026** with Node.js **24.22.3** and npm **11.19.1**, using the existing dependency lockfile. Direct dependencies are Axios **1.20.0** and Express **5.1.0**.
 
 ## Reproduce the checks
 
-Run from the repository root with the documented Node.js and npm versions:
+Run from the repository root with the versions declared in `.nvmrc` and `package.json`:
 
-```sh
+~~~sh
+node --version
+npm --version
 npm ci --ignore-scripts --no-audit --no-fund
 npm run validate
 npm run test:coverage
 npm ls --all --json
 npm audit --json
-```
+~~~
 
-The audit command is observational and currently exits 1 because of known vulnerabilities. Do not use `npm audit fix` to reproduce this dependency snapshot; it changes dependencies. Advisory responses can change over time, so a new audit may differ from the archived output.
+In Windows PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`. The local audit initially failed certificate verification. Retrying with Node's system CA store succeeded, with TLS verification enabled. If your environment requires the system trust store, append `--use-system-ca` to `NODE_OPTIONS` for the audit process. For example, in PowerShell:
 
-To reproduce the startup check, start the supplier and inventory processes as described in the [README](../README.md), list inventory, call `POST /sync`, and check `GET /sync/status`. The three quantities should become `[24, 0, 9]` in inventory order, with state `succeeded`. Stop both processes after the check.
+~~~powershell
+$previousNodeOptions = $env:NODE_OPTIONS
+try {
+    $env:NODE_OPTIONS = "$previousNodeOptions --use-system-ca".Trim()
+    npm.cmd audit --json
+} finally {
+    $env:NODE_OPTIONS = $previousNodeOptions
+}
+~~~
+
+No certificate settings or npm configuration were changed in the repository. A failed registry request is an unavailable audit result, not a clean security report. Audit responses can change as the advisory database changes. `npm audit fix` changes dependency versions and is not part of reproducing this snapshot.
 
 ## Results
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Clean npm installation | 79 packages; lockfile unchanged | [Summary](evidence/baseline-summary.json) |
-| npm run validate | Syntax checks passed; 33 tests passed, 0 failures or skips | [Validation output](evidence/validation.txt) |
-| npm run test:coverage | 33 tests passed | [Coverage output](evidence/coverage.txt) |
-| Server startup and synchronization | Both entrypoints bound to loopback; synchronization succeeded; processes stopped | [Startup output](evidence/startup-smoke.txt) |
-| npm ls --all --json | Exit 0 | [Installed graph](evidence/installed-tree.json) |
-| npm audit --json | Exit 1; 1 high-severity affected package with 32 advisory records | [Audit response](evidence/npm-audit.json) |
+| Clean installation | Exit 0; 81 packages; lockfile unchanged | [Installation output](evidence/2026-11-25/clean-install.txt) |
+| `npm run validate` | Syntax checks passed; 34 tests passed, zero failures or skips | [Validation output](evidence/2026-11-25/validation.txt) |
+| `npm run test:coverage` | 34 tests passed; loaded application modules have 100% line coverage | [Coverage output](evidence/2026-11-25/coverage.txt) |
+| Startup and synchronization | Both CLI entrypoints bound to loopback; synchronization succeeded; child processes stopped | [Startup output](evidence/2026-11-25/startup-smoke.txt) |
+| `npm ls --all --json` | Exit 0; installed versions match all 81 lockfile package locations | [Installed graph](evidence/2026-11-25/installed-tree.json) |
+| `npm audit --json` with system CA store | Exit 0; zero reported vulnerabilities | [Audit response](evidence/2026-11-25/npm-audit.json) |
 
-Tests cover successful inventory retrieval and synchronization, malformed and invalid supplier data, upstream HTTP errors, refused/reset connections, timeouts, mapping integrity, atomic updates, recovery, concurrent attempts, and sanitized error responses.
+The [machine-readable summary](evidence/2026-11-25/baseline-summary.json) records toolchain versions, the lockfile hash, and check results. These are local results; no remote GitHub Actions run is asserted.
 
-Coverage is 100% of lines in loaded application modules. Inventory mapping/state has 97.56% branch coverage; other loaded application modules have 100%. The runner's aggregate includes test/support files and excludes unloaded startup entrypoints. Startup was checked separately. Functional validation and coverage do not establish dependency security.
+## Behavior and coverage
 
-The GitHub Actions workflow performs a clean npm installation and `npm run validate` on pushes and pull requests, with read-only repository permissions. These archived results describe local validation, not a remote workflow run.
+Tests cover inventory retrieval, synchronization, malformed and invalid supplier data, upstream HTTP errors, refused/reset connections, timeouts, mapping integrity, atomic updates, recovery, overlapping attempts, sanitized errors, and bypassing environment HTTP proxies for the local supplier.
 
-## Dependency snapshot
+Coverage reports 100% of lines in loaded application modules. Inventory mapping/state has 97.56% branch coverage; other loaded application modules have 100%. The aggregate also includes the HTTP test helper. Unloaded startup entrypoints and `runtime.js` are excluded from this coverage report; startup success was checked separately. Functional tests and coverage do not establish dependency security.
 
-Every installed package version was compared with its lockfile entry. See the [complete dependency inventory](dependencies.md) for all 79 package locations and the [vulnerability register](known-vulnerabilities.md) for advisory IDs, affected ranges, and audit limitations.
+To repeat the startup check manually, start both processes as described in the [README](../README.md), list inventory, call `POST /sync`, and inspect `GET /sync/status`. Quantities should become `[24, 0, 9]`, costs `[310, 80, 1100]` cents, and state `succeeded`. Stop both processes afterward.
 
-Lockfile SHA-256:
+GitHub Actions reads the Node version from `.nvmrc`, installs npm 11.19.1, performs a clean dependency installation, and runs `npm run validate` with read-only repository permissions.
 
-```text
-d2cdaf03e6dc9a45b2e7ec9ba5ff89a5a318eb84eb5f82dc8635671768713743
-```
+## Historical evidence
 
-Node.js 20 is [end-of-life](https://nodejs.org/en/about/eol). The runtime version is documented for reproducibility; npm audit does not assess the runtime or operating system.
+The original November 23, 2026 results describe Node 20.20.2, npm 10.8.2, Axios 1.11.0, 79 package locations, and 33 tests. They are retained separately from current results. See the [evidence index](evidence/README.md) and [dependency security maintenance history](known-vulnerabilities.md).
 

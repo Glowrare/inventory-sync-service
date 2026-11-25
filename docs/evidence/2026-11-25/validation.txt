@@ -1,0 +1,55 @@
+
+> inventory-sync-service@0.1.0 validate
+> npm run check && npm test
+
+
+> inventory-sync-service@0.1.0 check
+> node scripts/check.js
+
+JavaScript syntax checks passed.
+
+> inventory-sync-service@0.1.0 test
+> node --test
+
+✔ real supplier and API list, find, synchronize, and expose successful status (221.7885ms)
+✔ unknown item and unknown route return sanitized 404s (37.994ms)
+✔ malformed JSON produces a safe 502 and preserves inventory (73.4104ms)
+✔ HTML response produces a safe 502 and preserves inventory (78.6492ms)
+✔ invalid stock produces a safe 502 and preserves inventory (73.9304ms)
+✔ upstream HTTP errors do not expose response bodies (36.8054ms)
+✔ connection refusal returns safe 502 (41.833ms)
+✔ upstream connection reset returns safe 502 (29.358ms)
+✔ real Axios timeout returns safe 504 and retains inventory (166.5003ms)
+✔ HTTP synchronization rejects overlap and recovers after upstream failure (134.4102ms)
+✔ unexpected internal error is sanitized by HTTP middleware (20.5228ms)
+✔ supplier requests bypass environment HTTP proxies (40.6319ms)
+✔ mapping uses supplier and SKU, preserves identities, accepts zero, and leaves inputs unchanged (6.5951ms)
+✔ rejects null response (4.4662ms)
+✔ rejects non-object JSON (1.4302ms)
+✔ rejects missing items (1.216ms)
+✔ rejects items is not an array (6.6884ms)
+✔ rejects incomplete snapshot (1.3178ms)
+✔ rejects null item (1.5625ms)
+✔ rejects missing SKU (8.0218ms)
+✔ rejects unknown supplier (2.2555ms)
+✔ rejects unknown SKU (1.6213ms)
+✔ rejects duplicate mapping (1.5409ms)
+✔ rejects negative quantity (1.3953ms)
+✔ rejects fractional quantity (1.3665ms)
+✔ rejects numeric string (1.5841ms)
+✔ rejects missing cost (1.504ms)
+✔ rejects fractional cost (1.6687ms)
+✔ rejects negative cost (1.2418ms)
+✔ rejects unsafe integer (2.4966ms)
+✔ store returns copies and does not mutate fixture records (5.1581ms)
+✔ failed synchronization is atomic, retains last success, and supports recovery (4.111ms)
+✔ overlapping synchronizations reject without corrupting the active attempt (1.8849ms)
+✔ unexpected exceptions become sanitized service failures (1.6279ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2883.8925

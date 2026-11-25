@@ -1,0 +1,38 @@
+x-development-build: &development-build
+  context: .
+  dockerfile: .devcontainer/Dockerfile
+
+services:
+  workspace:
+    build: *development-build
+    command: ["sleep", "infinity"]
+    init: true
+    working_dir: /workspace
+    environment:
+      HOST: "127.0.0.1"
+      PORT: "3000"
+      SUPPLIER_PORT: "3001"
+      SUPPLIER_BASE_URL: "http://supplier:3001"
+    volumes:
+      - .:/workspace
+      - workspace-dependencies:/workspace/node_modules
+    depends_on:
+      supplier:
+        condition: service_healthy
+
+  supplier:
+    build: *development-build
+    command: ["node", "src/mock-supplier/server.js"]
+    init: true
+    environment:
+      HOST: "0.0.0.0"
+      SUPPLIER_PORT: "3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/stock').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 6
+      start_period: 5s
+
+volumes:
+  workspace-dependencies:

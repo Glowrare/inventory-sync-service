@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "dependency-security-lab",
+  "name": "inventory-sync-service",
   "dependencies": {
     "axios": {
       "version": "1.11.0",

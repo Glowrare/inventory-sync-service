@@ -1,5 +1,5 @@
 
-> dependency-security-lab@0.1.0 test:coverage
+> inventory-sync-service@0.1.0 test:coverage
 > node --test --experimental-test-coverage
 
 TAP version 13

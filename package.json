@@ -1,11 +1,13 @@
 {
-  "name": "dependency-security-lab",
+  "name": "inventory-sync-service",
   "version": "0.1.0",
   "private": true,
-  "description": "Internal inventory synchronization service with a local supplier integration",
+  "description": "A service for maintaining inventory and synchronizing stock with supplier integrations.",
   "type": "module",
-  "engines": { "node": ">=20 <21" },
-  "packageManager": "npm@10.8.2",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "npm@11.19.1",
   "scripts": {
     "start": "node src/server.js",
     "start:supplier": "node src/mock-supplier/server.js",

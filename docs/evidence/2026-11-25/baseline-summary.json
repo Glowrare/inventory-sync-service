@@ -1,0 +1,49 @@
+{
+  "validationDate": "2026-11-25",
+  "nodeVersion": "24.22.3",
+  "npmVersion": "11.19.1",
+  "cleanInstall": {
+    "command": "npm ci --ignore-scripts --no-audit --no-fund",
+    "exitCode": 0,
+    "installedPackageLocations": 81,
+    "lockfileUnchanged": true
+  },
+  "lockfileSha256": "ef0ab35672ee73604a73bb44c8c92aeb2041dc2b0b9757906dabe566bf931799",
+  "dependencyEntriesUnchangedFromCommit": "5092f8a",
+  "directDependencies": {
+    "axios": "1.20.0",
+    "express": "5.1.0"
+  },
+  "validation": {
+    "command": "npm run validate",
+    "exitCode": 0,
+    "tests": 34,
+    "passed": 34,
+    "failed": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "command": "npm run test:coverage",
+    "exitCode": 0,
+    "tests": 34,
+    "passed": 34,
+    "loadedApplicationLinePercent": 100,
+    "includesStartupEntrypoints": false
+  },
+  "startupSmoke": {
+    "exitCode": 0,
+    "stoppedChildren": true
+  },
+  "audit": {
+    "command": "npm audit --json",
+    "nodeOptions": "--use-system-ca",
+    "exitCode": 0,
+    "affectedPackages": 0,
+    "initialAttempt": "Certificate verification failed; retry used the system CA store with TLS verification enabled."
+  },
+  "installedTree": {
+    "command": "npm ls --all --json",
+    "exitCode": 0,
+    "versionsMatchLockfile": true
+  }
+}
