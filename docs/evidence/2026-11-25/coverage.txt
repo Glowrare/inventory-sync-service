@@ -1,0 +1,66 @@
+
+> inventory-sync-service@0.1.0 test:coverage
+> node --test --experimental-test-coverage
+
+✔ real supplier and API list, find, synchronize, and expose successful status (227.7412ms)
+✔ unknown item and unknown route return sanitized 404s (36.4464ms)
+✔ malformed JSON produces a safe 502 and preserves inventory (70.3433ms)
+✔ HTML response produces a safe 502 and preserves inventory (68.7433ms)
+✔ invalid stock produces a safe 502 and preserves inventory (74.6321ms)
+✔ upstream HTTP errors do not expose response bodies (32.7386ms)
+✔ connection refusal returns safe 502 (36.8857ms)
+✔ upstream connection reset returns safe 502 (25.214ms)
+✔ real Axios timeout returns safe 504 and retains inventory (165.8165ms)
+✔ HTTP synchronization rejects overlap and recovers after upstream failure (101.5689ms)
+✔ unexpected internal error is sanitized by HTTP middleware (18.581ms)
+✔ supplier requests bypass environment HTTP proxies (43.4097ms)
+✔ mapping uses supplier and SKU, preserves identities, accepts zero, and leaves inputs unchanged (6.5399ms)
+✔ rejects null response (2.3697ms)
+✔ rejects non-object JSON (2.4651ms)
+✔ rejects missing items (1.6677ms)
+✔ rejects items is not an array (3.3529ms)
+✔ rejects incomplete snapshot (2.9055ms)
+✔ rejects null item (1.48ms)
+✔ rejects missing SKU (1.9331ms)
+✔ rejects unknown supplier (2.9172ms)
+✔ rejects unknown SKU (2.1236ms)
+✔ rejects duplicate mapping (1.5626ms)
+✔ rejects negative quantity (1.9213ms)
+✔ rejects fractional quantity (1.7254ms)
+✔ rejects numeric string (2.9125ms)
+✔ rejects missing cost (2.2816ms)
+✔ rejects fractional cost (1.5531ms)
+✔ rejects negative cost (1.1565ms)
+✔ rejects unsafe integer (1.2115ms)
+✔ store returns copies and does not mutate fixture records (5.9041ms)
+✔ failed synchronization is atomic, retains last success, and supports recovery (3.8703ms)
+✔ overlapping synchronizations reject without corrupting the active attempt (3.0615ms)
+✔ unexpected exceptions become sanitized service failures (3.2759ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2053.5493
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------
+ℹ file                 | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------
+ℹ src                  |        |          |         | 
+ℹ  app.js              | 100.00 |   100.00 |  100.00 | 
+ℹ  errors.js           | 100.00 |   100.00 |  100.00 | 
+ℹ  fixtures.js         | 100.00 |   100.00 |  100.00 | 
+ℹ  inventory.js        | 100.00 |    97.56 |  100.00 | 
+ℹ  mock-supplier       |        |          |         | 
+ℹ   app.js             | 100.00 |   100.00 |  100.00 | 
+ℹ  routes              |        |          |         | 
+ℹ   inventory.js       | 100.00 |   100.00 |  100.00 | 
+ℹ  supplier-client.js  | 100.00 |   100.00 |  100.00 | 
+ℹ support              |        |          |         | 
+ℹ  http.js             | 100.00 |    85.71 |   90.00 | 
+ℹ ---------------------------------------------------------------------
+ℹ all files            | 100.00 |    96.59 |   97.37 | 
+ℹ ---------------------------------------------------------------------
+ℹ end of coverage report

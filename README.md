@@ -1,115 +1,130 @@
 # Inventory Synchronization Service
 
-A small internal service for maintaining inventory and synchronizing stock with a supplier integration. Express provides the HTTP API, and Axios retrieves supplier stock.
+A service for maintaining inventory and synchronizing stock with supplier integrations. The application uses JavaScript ES modules, Express for its HTTP API, and Axios to retrieve supplier stock.
 
-The repository includes synthetic inventory and supplier fixtures and a local mock supplier for development and testing. Both processes bind to 127.0.0.1. Inventory is stored in memory; there is no database or authentication.
+The repository includes an inventory API and a separate synthetic supplier service for local development. Inventory is held in memory and initialized from JSON fixtures. Both processes bind to `127.0.0.1`.
 
-## Setup
+## Requirements and installation
 
-Use **Node.js 20.20.2** and **npm 10.8.2**. Node 20 is now [end-of-life](https://nodejs.org/en/about/eol); this version is documented for reproducibility and is not recommended for production.
+- Node.js **24.22.3**, pinned in [.nvmrc](.nvmrc); supported engine range: `>=24 <25`.
+- npm **11.19.1**, declared in [package.json](package.json).
 
-```sh
+Check your versions and install the locked dependencies:
+
+~~~sh
 node --version
 npm --version
-npm ci --ignore-scripts
-```
+npm ci --ignore-scripts --no-audit --no-fund
+~~~
 
-On Windows PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`. The lockfile is part of the baseline: use `npm ci`, which installs its exact versions.
+Use `npm ci` to install the exact snapshot in [package-lock.json](package-lock.json). In Windows PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`.
 
-Start the supplier in one terminal:
+## Run locally
 
-```sh
+Start the synthetic supplier in one terminal:
+
+~~~sh
 npm run start:supplier
-```
+~~~
 
 Start the inventory service in another:
 
-```sh
+~~~sh
 npm start
-```
+~~~
 
-Defaults: inventory at `http://127.0.0.1:3000`, supplier at `http://127.0.0.1:3001`. Optional environment variables `PORT` and `SUPPLIER_PORT` accept integers 1–65535. If changing the supplier port, set the same value in both terminals. There are no external supplier URLs to configure.
-
-## API and behavior
-
-| Method | Path | Result |
+| Process | Default address | Port variable |
 | --- | --- | --- |
-| GET | /inventory | `{ items: [...] }` containing the current snapshot |
-| GET | /inventory/:id | `{ item: {...} }`; unknown IDs return 404 |
-| POST | /sync | Synchronize all inventory; return updatedCount and synchronizedAt |
-| GET | /sync/status | state, lastAttemptAt, lastSuccessAt, lastErrorCode |
-| GET | supplier /stock | Synthetic upstream stock snapshot |
+| Inventory Sync Service | `http://127.0.0.1:3000` | `PORT` |
+| Synthetic supplier | `http://127.0.0.1:3001` | `SUPPLIER_PORT` |
 
-```sh
+Optional port variables must be integers from 1 through 65535. When changing `SUPPLIER_PORT`, set the same value in both terminals. The inventory entrypoint always connects to the local supplier; API requests cannot configure upstream URLs. No environment file is loaded automatically.
+
+Stop each process with Ctrl+C. Restarting the inventory service restores fixture data and clears synchronization status.
+
+## API
+
+The inventory API accepts these requests without authentication. `POST /sync` requires no request body.
+
+| Method | Path | Successful response |
+| --- | --- | --- |
+| GET | `/inventory` | `{ "items": [...] }` |
+| GET | `/inventory/:id` | `{ "item": {...} }` |
+| POST | `/sync` | `{ "updatedCount": 3, "synchronizedAt": "<ISO timestamp>" }` |
+| GET | `/sync/status` | `state`, `lastAttemptAt`, `lastSuccessAt`, `lastErrorCode` |
+
+The separate synthetic supplier exposes `GET /stock` on its own port.
+
+~~~sh
 curl http://127.0.0.1:3000/inventory
-curl -X POST http://127.0.0.1:3000/sync
 curl http://127.0.0.1:3000/inventory/inv-001
+curl -X POST http://127.0.0.1:3000/sync
 curl http://127.0.0.1:3000/sync/status
-```
+~~~
 
 Use `curl.exe` in Windows PowerShell to avoid its legacy `curl` alias.
 
-The inventory starts with three items and two suppliers. Synchronization calls the local supplier through Axios, joins records by supplier ID and SKU, and updates quantities and integer costs in cents. Stable IDs, names, and supplier associations remain intact. The supplier snapshot arrives in a different order and contains zero stock for one item.
+## Synchronization behavior
 
-A complete, valid snapshot is required: missing records, duplicates, unknown mappings, malformed responses, negative values, fractional values, and unsafe integers fail validation. Updates are atomic. A failed attempt retains inventory and the last successful synchronization timestamp; a later successful attempt clears the failure code. Simultaneous attempts return 409 while the active attempt completes.
+The fixtures contain three inventory items and two suppliers. Synchronization retrieves a complete supplier snapshot and matches records by supplier ID and SKU. It updates quantities and integer costs in cents while preserving item IDs, names, supplier associations, and inventory order. With the supplied fixtures, quantities change from `[12, 30, 4]` to `[24, 0, 9]`, and costs become `[310, 80, 1100]` cents.
 
-Synchronization states are `idle`, `syncing`, `succeeded`, and `failed`. The upstream timeout is 1,500 ms. Failures return:
+Snapshot validation rejects missing or duplicate mappings, unknown suppliers or SKUs, malformed responses, negative numbers, fractional numbers, and unsafe integers. Zero stock is valid. Updates are atomic: a failed attempt preserves inventory and the previous successful synchronization timestamp. A later successful attempt clears the failure code.
 
-- 502 / SUPPLIER_INVALID_RESPONSE for invalid supplier data.
-- 502 / SUPPLIER_UNAVAILABLE for HTTP failures or connection problems.
-- 504 / SUPPLIER_TIMEOUT for a timeout.
-- 409 / SYNC_IN_PROGRESS for an overlapping attempt.
-- 404 / NOT_FOUND for an unknown resource.
-- 500 / INTERNAL_ERROR for an unexpected exception.
+Synchronization states are `idle`, `syncing`, `succeeded`, and `failed`. Timestamp fields begin as `null`; populated timestamps use ISO format. The supplier request timeout is 1,500 ms. Overlapping synchronization returns HTTP 409 while the active attempt continues.
 
-Error bodies have the shape `{ error: { code, message } }`. Raw exceptions, upstream bodies, request configuration, and stack traces are not returned.
+| HTTP status | Error code | Meaning |
+| --- | --- | --- |
+| 404 | `NOT_FOUND` | Unknown item or route |
+| 409 | `SYNC_IN_PROGRESS` | Another synchronization is active |
+| 502 | `SUPPLIER_INVALID_RESPONSE` | Supplier data fails validation |
+| 502 | `SUPPLIER_UNAVAILABLE` | Supplier HTTP or connection failure |
+| 504 | `SUPPLIER_TIMEOUT` | Supplier request timed out |
+| 500 | `INTERNAL_ERROR` | Unexpected application error |
 
-Inventory is in memory. Restarting the inventory process restores its fixtures. There is no background synchronization. The standalone mock always serves its successful fixture; failure scenarios exist only inside the automated tests.
+Errors have the shape `{ "error": { "code": "...", "message": "..." } }`. Public responses omit raw exceptions, upstream bodies, request configuration, and stack traces.
 
-## Validation
+## Development and validation
 
-```sh
-npm test
-npm run validate
-npm run test:coverage
-npm ls --all
-npm audit --json
-```
+| Command | Purpose |
+| --- | --- |
+| `npm run check` | Check JavaScript syntax in source, tests, helpers, and scripts |
+| `npm test` | Run unit and integration tests with Node's test runner |
+| `npm run validate` | Run syntax checks and tests |
+| `npm run test:coverage` | Run tests with Node's coverage reporting |
+| `npm ls --all --json` | Inspect the installed dependency graph |
+| `npm audit --json` | Query current dependency advisories |
 
-`validate` runs JavaScript syntax checks and unit/integration tests. The tests use real loopback HTTP and Axios requests, including malformed data, connection refusal/reset, upstream HTTP errors, timeouts, recovery, atomicity, and safe errors. Test instances use ephemeral ports and close their servers.
+Tests exercise real loopback HTTP and Axios requests, mapping integrity, invalid payloads, upstream failures, timeouts, recovery, atomic updates, concurrency, safe errors, and direct supplier requests without environment proxies. Test servers use ephemeral ports and close after each test.
 
-The documented validation run passed **33 tests** under Node 20.20.2. See [validation evidence](docs/evidence/validation.txt) and [coverage evidence](docs/evidence/coverage.txt). Node 20's coverage option is experimental and reports loaded files; the startup entrypoints are checked separately by a [CLI smoke test](docs/evidence/startup-smoke.txt).
+The November 25, 2026 validation passed **34 tests with zero failures** on Node.js 24.22.3 and npm 11.19.1. See [validation results and reproduction steps](docs/validation.md). Coverage measures loaded modules; startup entrypoints are checked separately. GitHub Actions installs the pinned toolchain and runs `npm run validate` on pushes and pull requests with read-only repository permissions.
 
-`npm audit` currently exits 1 for unresolved vulnerabilities. Audit results are tracked separately from functional CI. Use the existing lockfile to reproduce the dependency snapshot; `npm audit fix` changes dependencies.
+## Dependencies and security maintenance
 
-## Structure
+The direct dependencies are Axios **1.20.0** and Express **5.1.0**. The existing lockfile is the authoritative snapshot. The November 25, 2026 npm audit returned **zero reported vulnerabilities**; this is a dated advisory-database observation, not a security guarantee.
 
-```text
+The [dependency inventory](docs/dependencies.md) describes the current graph. The [security maintenance record](docs/known-vulnerabilities.md) distinguishes the current audit from historical Axios 1.11.0 findings. Earlier captures remain in the [evidence directory](docs/evidence/README.md). Use `npm audit --json` to refresh advisory information; `npm audit fix` changes the dependency snapshot.
+
+## Repository structure
+
+~~~text
 src/
-  app.js, server.js          application factory and local entrypoint
+  app.js, server.js          inventory application factory and entrypoint
   routes/                   inventory and synchronization HTTP routes
-  supplier-client.js        Axios upstream communication and error mapping
-  inventory.js              mapping, atomic store, synchronization state
+  supplier-client.js        Axios supplier communication and error mapping
+  inventory.js              stock mapping, atomic store, synchronization state
   errors.js, fixtures.js    public errors and fixture loading
   runtime.js                local startup and port configuration
-  mock-supplier/            standalone synthetic supplier
-fixtures/                   inventory, suppliers, supplier stock
-test/unit/                  mapping, validation, state and integrity
-test/integration/           real HTTP/Axios behavior and failure handling
+  mock-supplier/            synthetic supplier application and entrypoint
+fixtures/                   inventory, supplier, and stock JSON data
+test/unit/                  mapping, state, and integrity tests
+test/integration/           HTTP, Axios, and failure handling tests
 support/                    test HTTP helpers
-scripts/                    syntax validation
-.github/workflows/          functional validation
-docs/                       validation, dependencies, findings and evidence
-```
+scripts/                    JavaScript syntax validation
+.github/workflows/          functional CI validation
+docs/                       dependency, validation, and security records
+  evidence/                 historical and dated validation output
+~~~
 
-## Dependency security maintenance
+## Operational scope
 
-Axios **1.11.0** is affected by [GHSA-4hjh-wcwx-xvwj / CVE-2025-58754](https://github.com/advisories/GHSA-4hjh-wcwx-xvwj), which covers unbounded in-memory decoding of data URIs in the Node adapter. The advisory affects Axios `>=1.0.0 <1.12.0` and `>=0.28.0 <0.30.2`. The dependency remains affected.
-
-Additional findings are listed in [known vulnerabilities](docs/known-vulnerabilities.md). The [dependency inventory](docs/dependencies.md), [lockfile](package-lock.json), and [audit response](docs/evidence/npm-audit.json) document the current snapshot. The resolved graph excludes known compromised Axios 1.14.1/0.30.4 and Debug 4.4.2 releases.
-
-The application uses a local supplier integration and accepts no supplier URLs from API requests. Payload validation and error handling support application correctness; they do not resolve dependency vulnerabilities.
-
-The GitHub Actions workflow runs functional validation with read-only repository permissions. Dependency auditing is separate from these checks; no automated dependency-update configuration is included in this repository.
-
-See [baseline validation](docs/validation.md) for reproducible commands, results, and coverage limitations.
+This baseline has no persistent database, authentication, background synchronization, or external supplier configuration. Each process owns its in-memory state; multiple inventory processes do not share data or synchronization locks. The standalone supplier always serves its successful synthetic fixture; failure scenarios are exercised in automated tests. Deployment beyond local development requires appropriate persistence, access controls, and operational configuration.
