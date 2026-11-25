@@ -11,11 +11,11 @@ The repository includes an inventory API and a separate synthetic supplier servi
 
 Check your versions and install the locked dependencies:
 
-~~~sh
+```sh
 node --version
 npm --version
 npm ci --ignore-scripts --no-audit --no-fund
-~~~
+```
 
 Use `npm ci` to install the exact snapshot in [package-lock.json](package-lock.json). In Windows PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`.
 
@@ -23,20 +23,20 @@ Use `npm ci` to install the exact snapshot in [package-lock.json](package-lock.j
 
 Start the synthetic supplier in one terminal:
 
-~~~sh
+```sh
 npm run start:supplier
-~~~
+```
 
 Start the inventory service in another:
 
-~~~sh
+```sh
 npm start
-~~~
+```
 
-| Process | Default address | Port variable |
-| --- | --- | --- |
-| Inventory Sync Service | `http://127.0.0.1:3000` | `PORT` |
-| Synthetic supplier | `http://127.0.0.1:3001` | `SUPPLIER_PORT` |
+| Process                | Default address         | Port variable   |
+| ---------------------- | ----------------------- | --------------- |
+| Inventory Sync Service | `http://127.0.0.1:3000` | `PORT`          |
+| Synthetic supplier     | `http://127.0.0.1:3001` | `SUPPLIER_PORT` |
 
 Optional port variables must be integers from 1 through 65535. When changing `SUPPLIER_PORT`, set the same value in both terminals. The inventory entrypoint always connects to the local supplier; API requests cannot configure upstream URLs. No environment file is loaded automatically.
 
@@ -54,28 +54,25 @@ The supplier is internal at `http://supplier:3000`, `HOST` cotrols the listening
 
 RUn `npm ci --ignore-scripts` after dependency changes. Rebuild the container after image or supplier changes. Reopen locally to stop the environment. The existing local workflow remains supported.
 
-node -e "fetch('http://supplier:3001/stock').then(r=>r.json()).then(console.log)"
-node -e "fetch('http://supplier:3001/stock').then(r=>r.text()).then(console.log).catch(console.error)
-
 ## API
 
 The inventory API accepts these requests without authentication. `POST /sync` requires no request body.
 
-| Method | Path | Successful response |
-| --- | --- | --- |
-| GET | `/inventory` | `{ "items": [...] }` |
-| GET | `/inventory/:id` | `{ "item": {...} }` |
-| POST | `/sync` | `{ "updatedCount": 3, "synchronizedAt": "<ISO timestamp>" }` |
-| GET | `/sync/status` | `state`, `lastAttemptAt`, `lastSuccessAt`, `lastErrorCode` |
+| Method | Path             | Successful response                                          |
+| ------ | ---------------- | ------------------------------------------------------------ |
+| GET    | `/inventory`     | `{ "items": [...] }`                                         |
+| GET    | `/inventory/:id` | `{ "item": {...} }`                                          |
+| POST   | `/sync`          | `{ "updatedCount": 3, "synchronizedAt": "<ISO timestamp>" }` |
+| GET    | `/sync/status`   | `state`, `lastAttemptAt`, `lastSuccessAt`, `lastErrorCode`   |
 
 The separate synthetic supplier exposes `GET /stock` on its own port.
 
-~~~sh
+```sh
 curl http://127.0.0.1:3000/inventory
 curl http://127.0.0.1:3000/inventory/inv-001
 curl -X POST http://127.0.0.1:3000/sync
 curl http://127.0.0.1:3000/sync/status
-~~~
+```
 
 Use `curl.exe` in Windows PowerShell to avoid its legacy `curl` alias.
 
@@ -87,27 +84,27 @@ Snapshot validation rejects missing or duplicate mappings, unknown suppliers or 
 
 Synchronization states are `idle`, `syncing`, `succeeded`, and `failed`. Timestamp fields begin as `null`; populated timestamps use ISO format. The supplier request timeout is 1,500 ms. Overlapping synchronization returns HTTP 409 while the active attempt continues.
 
-| HTTP status | Error code | Meaning |
-| --- | --- | --- |
-| 404 | `NOT_FOUND` | Unknown item or route |
-| 409 | `SYNC_IN_PROGRESS` | Another synchronization is active |
-| 502 | `SUPPLIER_INVALID_RESPONSE` | Supplier data fails validation |
-| 502 | `SUPPLIER_UNAVAILABLE` | Supplier HTTP or connection failure |
-| 504 | `SUPPLIER_TIMEOUT` | Supplier request timed out |
-| 500 | `INTERNAL_ERROR` | Unexpected application error |
+| HTTP status | Error code                  | Meaning                             |
+| ----------- | --------------------------- | ----------------------------------- |
+| 404         | `NOT_FOUND`                 | Unknown item or route               |
+| 409         | `SYNC_IN_PROGRESS`          | Another synchronization is active   |
+| 502         | `SUPPLIER_INVALID_RESPONSE` | Supplier data fails validation      |
+| 502         | `SUPPLIER_UNAVAILABLE`      | Supplier HTTP or connection failure |
+| 504         | `SUPPLIER_TIMEOUT`          | Supplier request timed out          |
+| 500         | `INTERNAL_ERROR`            | Unexpected application error        |
 
 Errors have the shape `{ "error": { "code": "...", "message": "..." } }`. Public responses omit raw exceptions, upstream bodies, request configuration, and stack traces.
 
 ## Development and validation
 
-| Command | Purpose |
-| --- | --- |
-| `npm run check` | Check JavaScript syntax in source, tests, helpers, and scripts |
-| `npm test` | Run unit and integration tests with Node's test runner |
-| `npm run validate` | Run syntax checks and tests |
-| `npm run test:coverage` | Run tests with Node's coverage reporting |
-| `npm ls --all --json` | Inspect the installed dependency graph |
-| `npm audit --json` | Query current dependency advisories |
+| Command                 | Purpose                                                        |
+| ----------------------- | -------------------------------------------------------------- |
+| `npm run check`         | Check JavaScript syntax in source, tests, helpers, and scripts |
+| `npm test`              | Run unit and integration tests with Node's test runner         |
+| `npm run validate`      | Run syntax checks and tests                                    |
+| `npm run test:coverage` | Run tests with Node's coverage reporting                       |
+| `npm ls --all --json`   | Inspect the installed dependency graph                         |
+| `npm audit --json`      | Query current dependency advisories                            |
 
 Tests exercise real loopback HTTP and Axios requests, mapping integrity, invalid payloads, upstream failures, timeouts, recovery, atomic updates, concurrency, safe errors, and direct supplier requests without environment proxies. Test servers use ephemeral ports and close after each test.
 
@@ -121,7 +118,7 @@ The [dependency inventory](docs/dependencies.md) describes the current graph. Th
 
 ## Repository structure
 
-~~~text
+```text
 src/
   app.js, server.js          inventory application factory and entrypoint
   routes/                   inventory and synchronization HTTP routes
@@ -138,7 +135,7 @@ scripts/                    JavaScript syntax validation
 .github/workflows/          functional CI validation
 docs/                       dependency, validation, and security records
   evidence/                 historical and dated validation output
-~~~
+```
 
 ## Operational scope
 
