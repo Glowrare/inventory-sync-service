@@ -42,6 +42,21 @@ Optional port variables must be integers from 1 through 65535. When changing `SU
 
 Stop each process with Ctrl+C. Restarting the inventory service restores fixture data and clears synchronization status.
 
+### Containerized development
+
+Requires Docker Desktop (Linux containers), Docker Compose and VS Code with Dev Containers.
+
+1. Run **Dev COntainers: Reopen in container**. The supplier starts automatically.
+2. In the container terminal, run `npm start` or launch **Debug Inventory API**.
+3. Open the forwarded API port (3000 by default) and run `npm run validate`.
+
+The supplier is internal at `http://supplier:3000`, `HOST` cotrols the listening address; `SUPPLIER_BASE_URL` overrides the local supplier URL. Source is bind-mounted; Linux dependencies use a named volume.
+
+RUn `npm ci --ignore-scripts` after dependency changes. Rebuild the container after image or supplier changes. Reopen locally to stop the environment. The existing local workflow remains supported.
+
+node -e "fetch('http://supplier:3001/stock').then(r=>r.json()).then(console.log)"
+node -e "fetch('http://supplier:3001/stock').then(r=>r.text()).then(console.log).catch(console.error)
+
 ## API
 
 The inventory API accepts these requests without authentication. `POST /sync` requires no request body.

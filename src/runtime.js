@@ -6,12 +6,24 @@ export function portFromEnvironment(name, fallback) {
   }
   return Number(value);
 }
+
+export function hostFromEnvironment() {
+  const host = process.env.HOST ?? '127.0.0.1';
+  if (!['127.0.0.1', '0.0.0.0'].includes(host)) {
+    throw new Error('HOST must be 127.0.0.1 or 0.0.0.0');
+  }
+  return host;
+}
+
 export function startLocalServer(app, port, label) {
-  const server = app.listen(port, '127.0.0.1', () => {
-    console.log(label + ': http://127.0.0.1:' + port);
+  const host = hostFromEnvironment();
+  const server = app.listen(port, host, () => {
+    console.log(label + ': http://' + host + ':' + port);
   });
   server.on('error', () => {
-    console.error(label + ' could not start; check whether its local port is available.');
+    console.error(
+      label + ' could not start; check whether its local port is available.',
+    );
     process.exitCode = 1;
   });
   const stop = () => server.close();

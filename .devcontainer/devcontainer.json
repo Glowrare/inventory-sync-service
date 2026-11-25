@@ -1,0 +1,25 @@
+{
+  "name": "Inventory Sync Development",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "workspace",
+  "runServices": ["supplier", "workspace"],
+  "workspaceFolder": "/workspace",
+  "remoteUser": "node",
+  "updateRemoteUserUID": false,
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Inventory API",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npm ci --ignore-scripts --no-audit --no-fund",
+  "customizations": {
+    "vscode": {
+      "extensions": ["redhat.vscode-yaml"],
+      "settings": { "remote.autoForwardPorts": false }
+    }
+  }
+}
