@@ -31,7 +31,7 @@ jobs:
           PROFILE: ${{ needs.validate.outputs.validation-profile }}
         run: |
           {
-            echo: "## CI Validation"
+            echo "## CI Validation"
             echo ""
             echo "| Property | Value |"
             echo "| --- | --- |"
