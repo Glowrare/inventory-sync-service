@@ -12,7 +12,7 @@ jobs:
   validate:
     uses: Glowrare/engineering-workflows/.github/workflows/node-ci.yml@0e36ff49736d7ec4d7b5ebf0fc30b8b8b3466b93
     with:
-      project-profile: service
+      project-profile: unsupported
       npm-version: '11.19.1'
       ignore-install-scripts: true
 
