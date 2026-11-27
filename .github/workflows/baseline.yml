@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   validate:
-    uses: Glowrare/engineering-workflows/.github/workflows/node-ci.yml@930770004f2aa891007044c2cda1df3b2f3cdb5f
+    uses: Glowrare/engineering-workflows/.github/workflows/node-ci.yml@ea8d615212d6efe7c25b558605a5cfbcb3e1e0db
     with:
       project-profile: service
       npm-version: '11.19.1'
