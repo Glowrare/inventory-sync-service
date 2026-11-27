@@ -3,20 +3,40 @@ name: Baseline validation
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   validate:
+    uses: Glowrare/engineering-workflows/.github/workflows/node-ci.yml@4720d10db99b2be09c1d134f8c3afac62746be78
+    with:
+      project-profile: service
+      npm-version: '11.19.1'
+      ignore-install-scripts: true
+
+  summary:
+    name: Validate summary
+    needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    permissions: {}
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm install --global npm@11.19.1 --ignore-scripts --no-audit --no-fund
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npm run validate
+      - name: Report validation metadata
+        shell: bash
+        env:
+          NODE_VERSION: ${{ needs.validate.outputs.resolved-node-version }}
+          NPM_VERSION: ${{ needs.validate.outputs.resolved-npm-version }}
+          PROFILE: ${{ needs.validate.outputs.validation-profile }}
+        run: |
+          {
+            echo: "## CI Validation"
+            echo ""
+            echo "| Property | Value |"
+            echo "| --- | --- |"
+            echo "| Profile | $PROFILE |"
+            echo "| Node.js | $NODE_VERSION |"
+            echo "| npm | $NPM_VERSION |"
+            echo "| Result | Passed |"
+          } >> "$GITHUB_STEP_SUMMARY"
